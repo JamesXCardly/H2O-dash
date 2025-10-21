@@ -725,56 +725,85 @@
         }
 
         // --- NEW: Confirm Order with Field Validation ---
-        function confirmOrder() {
-            const fullName = document.getElementById('fullName')?.value.trim() || "";
-            const phone = document.getElementById('phone')?.value.trim() || "";
-            const email = document.getElementById('email')?.value.trim() || "";
-            const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value || "pickup";
-            const address = document.getElementById('address')?.value.trim() || "";
-            const city = document.getElementById('city')?.value.trim() || "";
-            const state = document.getElementById('state')?.value.trim() || "";
+// --- Confirm Order with Full Validation ---
+function confirmOrder() {
+    const fullName = document.getElementById('fullName')?.value.trim() || "";
+    const phone = document.getElementById('phone')?.value.trim() || "";
+    const email = document.getElementById('email')?.value.trim() || "";
+    const deliveryOption = document.querySelector('input[name="deliveryOption"]:checked')?.value || "pickup";
+    const address = document.getElementById('address')?.value.trim() || "";
+    const city = document.getElementById('city')?.value.trim() || "";
+    const state = document.getElementById('state')?.value.trim() || "";
 
-            // ✅ 1. Validation
-            let totalItems = 0;
-            for (let key in prices) {
-                const qty = parseInt(document.getElementById(key)?.value || 0);
-                totalItems += qty;
+    // ✅ 1. Validate user information
+    if (!fullName || !phone || !email) {
+        alert("⚠️ Please fill in your Name, Phone Number, and Email before confirming your order.");
+        // Highlight empty fields for clarity
+        ['fullName', 'phone', 'email'].forEach(id => {
+            const input = document.getElementById(id);
+            if (!input.value.trim()) {
+                input.classList.add('border-danger');
+            } else {
+                input.classList.remove('border-danger');
             }
+        });
+        return;
+    } else {
+        ['fullName', 'phone', 'email'].forEach(id => document.getElementById(id).classList.remove('border-danger'));
+    }
 
-            if (totalItems === 0) {
-                alert("⚠️ Please select at least one product before confirming your order.");
-                return;
-            }
+    // ✅ 2. Validate product selection
+    let totalItems = 0;
+    for (let key in prices) {
+        const qty = parseInt(document.getElementById(key)?.value || 0);
+        totalItems += qty;
+    }
 
-            if (deliveryOption === "delivery") {
-                if (!address || !city || !state) {
-                    alert("🚚 Please complete all delivery address fields.");
-                    return;
+    if (totalItems === 0) {
+        alert("⚠️ Please select at least one product before confirming your order.");
+        return;
+    }
+
+    // ✅ 3. Validate delivery fields if needed
+    if (deliveryOption === "delivery") {
+        if (!address || !city || !state) {
+            alert("🚚 Please complete all delivery address fields before confirming your order.");
+            ['address', 'city', 'state'].forEach(id => {
+                const input = document.getElementById(id);
+                if (!input.value.trim()) {
+                    input.classList.add('border-danger');
+                } else {
+                    input.classList.remove('border-danger');
                 }
-            }
+            });
+            return;
+        } else {
+            ['address', 'city', 'state'].forEach(id => document.getElementById(id).classList.remove('border-danger'));
+        }
+    }
 
-            // ✅ 2. Calculate totals
-            let subtotal = 0;
-            for (let key in prices) {
-                const qty = parseInt(document.getElementById(key)?.value || 0);
-                subtotal += qty * prices[key];
-            }
-            const discount = subtotal * 0.05;
-            const finalTotal = subtotal - discount;
-            const formattedTotal = `₦${finalTotal.toLocaleString()}`;
+    // ✅ 4. Calculate totals
+    let subtotal = 0;
+    for (let key in prices) {
+        const qty = parseInt(document.getElementById(key)?.value || 0);
+        subtotal += qty * prices[key];
+    }
+    const discount = subtotal * 0.05;
+    const finalTotal = subtotal - discount;
+    const formattedTotal = `₦${finalTotal.toLocaleString()}`;
 
-            // ✅ 3. Build order details
-            let orderDetails = "";
-            for (let key in prices) {
-                const qty = parseInt(document.getElementById(key)?.value || 0);
-                if (qty > 0) {
-                    orderDetails += `- ${key.replace(/([A-Z])/g, ' $1')}: ${qty}\n`;
-                }
-            }
+    // ✅ 5. Build order details
+    let orderDetails = "";
+    for (let key in prices) {
+        const qty = parseInt(document.getElementById(key)?.value || 0);
+        if (qty > 0) {
+            orderDetails += `- ${key.replace(/([A-Z])/g, ' $1')}: ${qty}\n`;
+        }
+    }
 
-            // ✅ 4. Build plain-text WhatsApp message
-            const message =
-                `NEW WATER ORDER RECEIVED
+    // ✅ 6. Build WhatsApp message
+    const message =
+        `NEW WATER ORDER RECEIVED
 ------------------------------
 Customer: ${fullName}
 Phone: ${phone}
@@ -787,18 +816,16 @@ ${orderDetails}
 Total: ${formattedTotal}
 Status: Pending Confirmation`;
 
-            // ✅ 5. Your WhatsApp business number
-            const businessNumber = "2348138300256"; // Change to your number
+    // ✅ 7. Send to WhatsApp
+    const businessNumber = "2348138300256"; // your WhatsApp number
+    const whatsappURL = `https://wa.me/${businessNumber}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappURL, "_blank");
 
-            // ✅ 6. Encode message and open WhatsApp
-            const whatsappURL = `https://wa.me/${businessNumber}?text=${encodeURIComponent(message)}`;
-            window.open(whatsappURL, "_blank");
-
-            // ✅ 7. Success alert and reset form
-            alert("✅ Your order has been submitted successfully! We'll reach out on WhatsApp shortly.");
-            document.getElementById('waterOrderForm').reset();
-            toggleDeliveryAddress();
-        }
+    // ✅ 8. Success alert & reset
+    alert("✅ Your order has been submitted successfully! We'll reach out on WhatsApp shortly.");
+    document.getElementById('waterOrderForm').reset();
+    toggleDeliveryAddress();
+}
 
 
         // --- Build Order Summary Modal on Show ---
