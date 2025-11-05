@@ -1084,3 +1084,48 @@
 .olumide{
      font-family: "Comic Sans MS", "Comic Sans",;
 }
+
+  .faq-section {
+    background: linear-gradient(180deg, #f9fbfc 0%, #f5f9ff 100%);
+  }
+
+  .faq-section .accordion-button {
+    background-color: #fff;
+    font-weight: 600;
+    color: #3cbeee;
+    transition: all 0.3s ease;
+  }
+
+  .faq-section .accordion-button:hover {
+    background-color: #e9f3ff;
+  }
+
+  .faq-section .accordion-button:focus {
+    box-shadow: none;
+  }
+
+  .faq-section .accordion-button::after {
+    content: "\f078";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: #3cbeee;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+  }
+
+  .faq-section .accordion-button:not(.collapsed)::after {
+    transform: rotate(180deg);
+  }
+
+  .accordion-body {
+    background-color: #fff;
+    color: #444;
+    line-height: 1.7;
+    border-left: 3px solid #3cbeee;
+    padding: 1rem 1.25rem;
+  }
+
+  .accordion-item {
+    border-radius: 10px;
+    overflow: hidden;
+  }
